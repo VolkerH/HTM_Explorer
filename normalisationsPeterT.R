@@ -127,7 +127,7 @@ htmPeterTNormalization <- function(htm) {
       cat("Treatment column is called ", treatcol, "\n")
 
 
-      controlwells <- sort(unique(data[data[,treatcol] %in% negcontrols][,wellcol]))
+      controlwells <- sort(unique(data[data[, treatcol] %in% negcontrols,wellcol]))
 
       cat("Controlwells:\n")
       cat(controlwells)
