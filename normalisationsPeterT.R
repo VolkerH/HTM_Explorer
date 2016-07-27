@@ -125,9 +125,9 @@ htmPeterTNormalization <- function(htm) {
       cat("Well column is called ", wellcol, "\n")
       treatcol <- htmGetListSetting(htm,"columns","treatment")
       cat("Treatment column is called ", treatcol, "\n")
+      expcol <- htmGetListSetting(htm,"columns","experiment")
 
-
-      controlwells <- sort(unique(data[data[, treatcol] %in% negcontrols,wellcol]))
+      controlwells <- sort(unique(data[data[,expcol] %in% experiment & data[, treatcol] %in% negcontrols,wellcol]))
 
       cat("Controlwells:\n")
       cat(controlwells)
@@ -136,9 +136,11 @@ htmPeterTNormalization <- function(htm) {
       for (normwell in controlwells)
       {
 
-         cat("Normalizing wells ", normwell+1, " and ", normwell+2 , " against ", normwell , "\n")
+      cat("Normalizing wells ", normwell+1, " and ", normwell+2 , " against ", normwell , "\n")
 
-      currentwells = c(normwell, normwell+1, normwell+2)
+
+      currentwells <- c(normwell, normwell+1, normwell+2)
+      cat("current wells :",  currentwells  , "\n")
       indices_all <- which(data[[htm@settings@columns$experiment]] == experiment & data[,wellcol] %in% currentwells)
       indices_ok <- which((data[[htm@settings@columns$experiment]] == experiment) & (data$HTM_qc) & !is.na(data[[input]] & data[,wellcol] %in% currentwells))
 
@@ -156,9 +158,15 @@ htmPeterTNormalization <- function(htm) {
       valuescontrol <- data[indices_controls_ok, input]
       #print(valuescontrol)
 
+      cat("control values ", valuescontrol, "\n")
       nr_of_controls <-  length(valuescontrol)
+      cat ("nr of controls ", nr_of_controls , "\n")
+
       meancontrol <- mean(valuescontrol)
+
       sigmacontrol <- sd(valuescontrol)
+
+
       mediancontrol <- median(valuescontrol)
       madcontrol <- mad(valuescontrol)
       semcontrol <- sigmacontrol/sqrt(nr_of_controls)
