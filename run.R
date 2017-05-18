@@ -1,40 +1,41 @@
-# path = "C:\\Users\\Christian Tischer\\Dropbox\\R\\HTM\\HTM_Explorer\\HTM_Explorer";setwd(path);source("run.R");
 # path = "\\\\almf\\almf\\software\\scripts\\R\\HTM_Explorer";setwd(path);source("run.R");
-# path = "/Users/tischi/Dropbox/R/HTM/HTM_Explorer/HTM_Explorer";setwd(path);source("run.R"); 
 
-# path = "/Users/tischi/Downloads/HTM_Explorer-master/";setwd(path);source("run.R"); 
 
 if (!require("gWidgets")) {
-  install.packages("gWidgets", dependencies=TRUE, repos='http://cran.rstudio.com/')
+  install.packages("gWidgets")
   library(gWidgets)
 }
 if (!require("gWidgetstcltk")) {
-  install.packages("gWidgetstcltk", dependencies=TRUE, repos='http://cran.rstudio.com/')
+  install.packages("gWidgetstcltk")
   library(gWidgetstcltk)
 }
 if (!require("markdown")) {
-  install.packages("markdown", dependencies=TRUE, repos='http://cran.rstudio.com/')
+  install.packages("markdown")
   library(markdown)
 }
 if (!require("plyr")) {
-  install.packages("plyr", dependencies=TRUE, repos='http://cran.rstudio.com/')
+  install.packages("plyr")
   library(plyr)
 }
 if (!require("RColorBrewer")) {
-  install.packages("RColorBrewer", dependencies=TRUE, repos='http://cran.rstudio.com/')
+  install.packages("RColorBrewer")
   library(RColorBrewer)
 }
-if (!require("EBImage")) {
-  source("https://bioconductor.org/biocLite.R", dependencies=TRUE, repos='http://cran.rstudio.com/')
-  biocLite("EBImage")
-  library(EBImage)
-}
 if (!require("raster")) {
-  install.packages("raster", dependencies=TRUE, repos='http://cran.rstudio.com/')
+  install.packages("raster")
   library(raster)
 }
+#if (!require("plotly")) {
+#  install.packages("plotly")
+#  library(plotly)
+#}
+#if (!require("shiny")) {
+#  install.packages("shiny")
+#  library(plotly)
+#}
 
-options(warn = 2)
+
+#options(warn = 2)
 
 
 ## source code
