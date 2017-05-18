@@ -65,19 +65,17 @@ htmShowDataFromRow <- function(htm,data,irs,appendCommand=""){
     return(0)
   }
   
-  filenamePrefix = htm@settings@visualisation$image_filename_prefix
-  foldernamePrefix = htm@settings@visualisation$image_foldername_prefix
+  filenamePrefix   = gsub("\\\\", "/", htm@settings@visualisation$image_filename_prefix)
+  foldernamePrefix = gsub("\\\\", "/", htm@settings@visualisation$image_foldername_prefix)
   
   # convert to forward slashes immediately, otherwise gsub has problems later
   rootFolderTable = gsub("\\\\" ,"/",htmGetListSetting(htm,"visualisation","image_root_foldername_in_table"))
-  rootFolderReal = gsub("\\\\" ,"/",htmGetListSetting(htm,"visualisation","image_root_foldername_on_this_computer"))  
+  rootFolderReal  = gsub("\\\\" ,"/",htmGetListSetting(htm,"visualisation","image_root_foldername_on_this_computer"))  
   
   if( .Platform$OS.type == "unix" ) {
-    #imageViewerCMD = "/Applications/Fiji.app/Contents/MacOS/fiji-macosx --no-splash"
     imageViewerCMD = '/Applications/Fiji.app/Contents/MacOS/ImageJ-macosx -debug '
   } else if( .Platform$OS.type == "windows" ) {
     imageViewerCMD = paste("\"",htm@settings@visualisation$windows_path_to_fiji,"\""," -debug ",sep="")
-    #imageViewerCMD = "\"c:\\Program Files\\FIJI\\fiji-win64.exe\" --no-splash -macro"
   } else {
     imageViewerCMD = "unkown"
   }
@@ -120,10 +118,20 @@ htmShowDataFromRow <- function(htm,data,irs,appendCommand=""){
           
           pathname = paste(foldername,"/",filename,sep="")
           
+	  # Add preceding slash as workaround for recent Fiji versions (otherwise 
+	  # pathnames are interpreted as relative paths
           if(!grepl("^/", pathname)) {
             pathname = paste0("/",pathname)
           }
+
+	   # If we worked on windows change path separators back from / to \\
+           #if ( .Platform$OS.type == "windows" ) {
+           
+	   if(True) { 
+	      pathname = gsub("/", "\\\\", pathname)
+           }
           
+
           if(imagename %in% htmGetListSetting(htm,"visualisation","viewImages")) {
             #cmd = paste(cmd, paste0(' -eval \"open(\'',pathname,'\')\"') )
             cmd = paste(cmd, paste0('open(\'',pathname,'\');\n') )
@@ -153,7 +161,9 @@ htmShowDataFromRow <- function(htm,data,irs,appendCommand=""){
             } else if ( .Platform$OS.type == "windows" ) {
               pathname = gsub("/", "\\\\", pathname)
             }
-            
+           
+
+	   ##### BUG images not defined 
            
             images = c(images, pathname)
             
@@ -161,6 +171,8 @@ htmShowDataFromRow <- function(htm,data,irs,appendCommand=""){
               locX = c(locX, round(data$Location_Center_X[ir]))
               locY = c(locY, round(data$Location_Center_Y[ir]))
             } else {
+
+	    #### BUG locX, LocY not defined !
               locX = c(locX, 0)
               locY = c(locY, 0)
             }
