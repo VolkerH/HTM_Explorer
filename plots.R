@@ -148,9 +148,7 @@ htmShowDataFromRow <- function(htm, data, irs, appendCommand="") {
             print(colname)
             print("Hallo")
             pathname = gsub("\\\\" ,"/",data[[colname]][ir])
-            #print(pathname)
-            #print(rootFolderReal)
-            #print(rootFolderTable)
+
             pathname = gsub(rootFolderTable, rootFolderReal, pathname)
             print("Pathname")
             print(pathname)
@@ -163,7 +161,6 @@ htmShowDataFromRow <- function(htm, data, irs, appendCommand="") {
               pathname = gsub("/", "\\\\", pathname)
               print("windows")
             }
-            print(pathname)
 
             # Run (Movie FFMPEG) plugin
             # Requires FFMPEG plugin installed in Fiji (go to Fiji->Help->Update->Manage Update Sites , check FFMPEG)
@@ -204,8 +201,6 @@ htmShowDataFromRow <- function(htm, data, irs, appendCommand="") {
   full_cmd = paste(imageViewerCMD,'-macro',paste0('\"',tmp_file,'\"'));
   print(full_cmd)
   system(full_cmd,wait=F)
-  
-  
 }
 
 htmShowWellsFromRow <- function(htm,data,ir){
