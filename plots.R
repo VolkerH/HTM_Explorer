@@ -57,7 +57,7 @@ colorbar <- function(lut, min, max, nticks=11, ticks=seq(min, max, len=nticks), 
 # Image Viewing
 #
 
-htmShowDataFromRow <- function(htm,data,irs,appendCommand=""){
+htmShowDataFromRow <- function(htm, data, irs, appendCommand="") {
   
   if(htmGetListSetting(htm,"visualisation","viewImages") == "None selected") {
     print("")
@@ -74,12 +74,17 @@ htmShowDataFromRow <- function(htm,data,irs,appendCommand=""){
   
   if( .Platform$OS.type == "unix" ) {
     imageViewerCMD = '/Applications/Fiji.app/Contents/MacOS/ImageJ-macosx -debug '
-  } else if( .Platform$OS.type == "windows" ) {
+  }
+  else if( .Platform$OS.type == "windows" ) {
     imageViewerCMD = paste("\"",htm@settings@visualisation$windows_path_to_fiji,"\""," -debug ",sep="")
-  } else {
+  }
+  else {
     imageViewerCMD = "unkown"
   }
-  
+
+  print("irs")
+  print(irs)
+
   cmd = ""
   
   # check that the columns exist in general
@@ -92,20 +97,17 @@ htmShowDataFromRow <- function(htm,data,irs,appendCommand=""){
     if( grepl(foldernamePrefix,colname) ) {
       foldername_found = T
       }
-    }
+  }
   
   if ( (filename_found != T) || (foldername_found != T) ) {
     gmessage("File- or Foldername columns not found. Please re-configure: [Configure > Configure Visualisation Settings]")
     return(NULL)
-    }
+  }
   
   
   for ( ir in irs) {
- 
     for ( colname in colnames(data) ) {
-      
-      if( foldernamePrefix != "" ) {  
-        
+      if( foldernamePrefix != "" ) {
         # construct pathname from file- and folder-name
         if( grepl(filenamePrefix, colname) ) {
           
@@ -118,96 +120,69 @@ htmShowDataFromRow <- function(htm,data,irs,appendCommand=""){
           
           pathname = paste(foldername,"/",filename,sep="")
           
-	  # Add preceding slash as workaround for recent Fiji versions (otherwise 
-	  # pathnames are interpreted as relative paths
+	      # Add preceding slash as workaround for recent Fiji versions (otherwise
+	      # pathnames are interpreted as relative paths
           if(!grepl("^/", pathname)) {
             pathname = paste0("/",pathname)
           }
 
-	   # If we worked on windows change path separators back from / to \\
-           #if ( .Platform$OS.type == "windows" ) {
-           
-	   if(True) { 
-	      pathname = gsub("/", "\\\\", pathname)
-           }
-          
+	       # If we worked on windows change path separators back from / to \\
+          if ( .Platform$OS.type == "windows" ) {
+	          pathname = gsub("/", "\\\\", pathname)
+          }
 
           if(imagename %in% htmGetListSetting(htm,"visualisation","viewImages")) {
             #cmd = paste(cmd, paste0(' -eval \"open(\'',pathname,'\')\"') )
             cmd = paste(cmd, paste0('open(\'',pathname,'\');\n') )
-            
           }
-          
-          
         } # from file- and folder-name
         
-      } else {
-        
+      }
+      else {
+        # this else branch is modified for cvogel
+        #
         # directly get the pathname=filename
         if( grepl(filenamePrefix, colname) ) {
-          
           imagename = strsplit(colname,filenamePrefix)[[1]][2]
           if(imagename %in% htmGetListSetting(htm,"visualisation","viewImages")) {
             print(colname)
+            print("Hallo")
             pathname = gsub("\\\\" ,"/",data[[colname]][ir])
             #print(pathname)
             #print(rootFolderReal)
             #print(rootFolderTable)
             pathname = gsub(rootFolderTable, rootFolderReal, pathname)
-            #print(pathname)
+            print("Pathname")
+            print(pathname)
             
             if ( .Platform$OS.type == "unix" ) {
               pathname = gsub("\\\\" ,"/", pathname)
-            } else if ( .Platform$OS.type == "windows" ) {
+              print("unix")
+            }
+            else if ( .Platform$OS.type == "windows" ) {
               pathname = gsub("/", "\\\\", pathname)
+              print("windows")
             }
-           
+            print(pathname)
 
-	   ##### BUG images not defined 
-           
-            images = c(images, pathname)
-            
-            if(("Location_Center_X" %in% names(data)) && ("Location_Center_Y" %in% names(data))) {
-              locX = c(locX, round(data$Location_Center_X[ir]))
-              locY = c(locY, round(data$Location_Center_Y[ir]))
-            } else {
+            # Run (Movie FFMPEG) plugin
+            # Requires FFMPEG plugin installed in Fiji (go to Fiji->Help->Update->Manage Update Sites , check FFMPEG)
+            # make sure you do this for the Image J executable that is configured in the visualisation settings
+            # (it is not uncommon to have several imageJ versions installed on a single machine)
+            cmd = paste(cmd, paste0('run(\"Movie (FFMPEG)...\", \"choose=', pathname,' , use_virtual_stack first_frame=0 last_frame=-1\");\n'))
+           }
+         }
+       } # from pathname
+       print("end from pathname")
+     } # colname loop (within one row)
+     print("end of colname")
+    }
+    print("end irs")
+  #} # row loop
+  #print("end row loop")
 
-	    #### BUG locX, LocY not defined !
-              locX = c(locX, 0)
-              locY = c(locY, 0)
-            }
-            
-            #print(pathname)
-          }      
-          
-        }
-        
-      } # from pathname
-      
-    } # colname loop (within one row)
-    
-    # make stack
-    #cmd = paste(cmd, paste0(' -eval \"run(\'Images to Stack\');\"'))
-    # make composite
-    #cmd = paste(cmd, paste0(' -eval \"run(\'Make Composite\', \'display=Composite\');\"'));  
-    
-    # autoscale display
-    #cmd = paste(cmd, paste0(' -eval \"run(\'Enhance Contrast\', \'saturated=0.01\')\"'))
-    
-    if(("Location_Center_X" %in% names(data)) && ("Location_Center_Y" %in% names(data))) {
-      #cmd = paste(cmd,' -eval \"makePoint(',round(data$Location_Center_X[ir]),',',round(data$Location_Center_Y[ir]),');\"')
-      x <- round(data$Location_Center_X[ir])
-      y <- round(data$Location_Center_Y[ir])
-      #cmd = paste(cmd, paste0(' -eval \"makeRectangle(',x-50,',',y-50,',',100,',',100,');\"'))
-      #cmd = paste(cmd, paste0(' -eval \"run(\'Draw\', \'slice\');\"'))
-      cmd = paste(cmd, paste0('makeRectangle(',x-50,',',y-50,',',100,',',100,');\n'))
-      cmd = paste(cmd, paste0('run(\'Draw\', \'slice\');\n'))
-      
-      }
-    
-    
-  } # row loop
-  
+  print("cmd")
+  print(cmd)
   if(length(irs)>1) {
     # make stack
     #cmd = paste(cmd, paste0(' -eval \"run(\'Images to Stack\');\"'))
